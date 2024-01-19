@@ -52,7 +52,6 @@ const LoginScreen = ({ navigation }) => {
 
   useEffect(() => {
     const subscriber = onAuthStateChanged(auth, async (user) => {
-      console.log("user", user);
       if (user) {
         const newUser = {
           id: user.uid,

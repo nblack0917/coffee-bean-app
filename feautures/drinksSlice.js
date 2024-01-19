@@ -1,51 +1,27 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  drink: {
-    id: null,
-    imgUrl: null,
-    name: null,
-    subtext: null,
-    rating: null,
-    type: null,
-    description: null,
-    roast: [],
-    sizes: [],
-    ingredients: [],
-    addons: [],
-    price: null,
-  },
+  allDrinks: [],
+  allBeans: [],
 };
 
 export const drinksSlice = createSlice({
   name: "drinks",
   initialState,
   reducers: {
-    setDrink: (state, action) => {
-      state.drink = action.payload;
+    setAllDrinks: (state, action) => {
+      state.allDrinks = action.payload;
     },
-    removeDrink: (state) => {
-      state.drink = {
-        id: null,
-        imgUrl: null,
-        name: null,
-        subtext: null,
-        rating: null,
-        type: null,
-        description: null,
-        roast: [],
-        sizes: [],
-        ingredients: [],
-        addons: [],
-        price: null,
-      };
+    setAllBeans: (state, action) => {
+      state.allBeans = action.payload;
     },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { setDrink, removeDrink } = drinksSlice.actions;
+export const { setAllDrinks, setAllBeans } = drinksSlice.actions;
 
-export const selectDrink = (state) => state.drinks.drink;
+export const selectDrinks = (state) => state.drinks.allDrinks;
+export const selectBeans = (state) => state.drinks.allBeans;
 
 export default drinksSlice.reducer;

@@ -9,12 +9,24 @@ import config from "../config";
 const defaultURL =
   "https://firebasestorage.googleapis.com/v0/b/coffee-bean-app.appspot.com/o/profileCupPlaceholder.png?alt=media&token=00b42fb6-0973-4186-987e-fbd8777a1c90";
 
-const HeaderBar = ({ style }) => {
+const HeaderBar = ({
+  style,
+  isFavorite,
+  addToFavorites,
+  removeFromFavorites,
+}) => {
   const navigation = useNavigation();
   const route = useRoute();
 
   const signOutUser = () => {
     auth.signOut().then(() => navigation.replace("Login"));
+  };
+
+  const handleAddToFavorites = () => {
+    addToFavorites();
+  };
+  const handleRemoveFromFavorites = () => {
+    removeFromFavorites();
   };
 
   return (
@@ -55,18 +67,33 @@ const HeaderBar = ({ style }) => {
                   color={config.color.MD_GRAY}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
-                // onPress={() => navigation.goBack()}
-                className="rounded-2xl p-2"
-                style={styles.backContainer}
-              >
-                <Icon
-                  name="heart"
-                  type="ionicon"
-                  size={22}
-                  color={config.color.RED}
-                />
-              </TouchableOpacity>
+              {isFavorite ? (
+                <TouchableOpacity
+                  onPress={handleRemoveFromFavorites}
+                  className="rounded-2xl p-2"
+                  style={styles.backContainer}
+                >
+                  <Icon
+                    name="heart"
+                    type="ionicon"
+                    size={22}
+                    color={config.color.RED}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={handleAddToFavorites}
+                  className="rounded-2xl p-2"
+                  style={styles.backContainer}
+                >
+                  <Icon
+                    name="heart"
+                    type="ionicon"
+                    size={22}
+                    color={config.color.MD_GRAY}
+                  />
+                </TouchableOpacity>
+              )}
             </>
           </View>
         </View>

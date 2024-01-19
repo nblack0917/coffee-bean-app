@@ -25,7 +25,7 @@ export const userSlice = createSlice({
     },
     removeFromFavorites: (state, action) => {
       const index = state.user.favorites.findIndex(
-        (item) => item.id === action.payload.id
+        (item) => item._id === action.payload._id
       );
 
       let newFavorites = [...state.user.favorites];

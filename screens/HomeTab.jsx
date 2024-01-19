@@ -13,15 +13,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../feautures/userSlice";
 import { selectCategory } from "../feautures/categorySlice";
 import { categoryDrinkFilter } from "../utils/drinks/categoryDrinkFilter";
+import {
+  selectBeans,
+  selectDrinks,
+  setAllDrinks,
+  setAllBeans,
+} from "../feautures/drinksSlice";
 
 const HomeTab = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [allDrinks, setAllDrinks] = useState([]);
+  // const [allDrinks, setAllDrinks] = useState([]);
   const [categoryDrinks, setCategoryDrinks] = useState([]);
-  const [allBeans, setAllBeans] = useState([]);
+  // const [allBeans, setAllBeans] = useState([]);
 
-  const user = useSelector(selectUser);
   const category = useSelector(selectCategory);
+  const allDrinks = useSelector(selectDrinks);
+  const allBeans = useSelector(selectBeans);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -49,7 +56,7 @@ const HomeTab = () => {
         `
       )
       .then((data) => {
-        setAllDrinks(data);
+        dispatch(setAllDrinks(data));
       });
 
     sanityClient
@@ -76,7 +83,7 @@ const HomeTab = () => {
         `
       )
       .then((data) => {
-        setAllBeans(data);
+        dispatch(setAllBeans(data));
       });
   }, []);
 
@@ -84,7 +91,6 @@ const HomeTab = () => {
     if (allDrinks && category === "All") {
       setCategoryDrinks(allDrinks);
     } else {
-      console.log("check");
       const selectDrinks = categoryDrinkFilter(allDrinks, category);
       setCategoryDrinks(selectDrinks);
     }

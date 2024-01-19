@@ -7,33 +7,54 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import config from "../config";
 import { urlFor } from "../sanity";
 import HeaderBar from "../components/HeaderBar";
 import { Icon, ListItem } from "@rneui/themed";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getIngredientIcon,
   getIngredientType,
 } from "../utils/drinks/ingredient";
+import { priceAdjuster } from "../utils/drinks/priceAdjuster";
+import { db } from "../firebase";
+import {
+  addToFavories,
+  removeFromFavorites,
+  selectUser,
+} from "../feautures/userSlice";
+import { doc, updateDoc } from "firebase/firestore";
 
 const ProductDetailScreen = () => {
   const [expand, setExpand] = useState(2);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const user = useSelector(selectUser);
+  const dispatch = useDispatch();
+
   const {
     params: { product },
   } = useRoute();
 
   const addCents = (price) => {
     let currPrice = price.toString();
+    let checkCents = currPrice.split(".");
     let newPrice;
-    if (currPrice.length === 3) {
-      newPrice = currPrice.concat("0");
-    } else if (currPrice.length === 1) {
+    if (checkCents.length > 1) {
+      if (checkCents[1].length === 1) {
+        newPrice = currPrice.concat("0");
+      } else if (checkCents[1].length === 3) {
+        newPrice = price.toString().slice(0, -1);
+      } else {
+        newPrice = price.toString();
+      }
+    } else if (checkCents.length === 1) {
       newPrice = currPrice.concat(".00");
-    } else {
-      newPrice = price.toString();
     }
+
     return newPrice;
   };
 
@@ -56,10 +77,52 @@ const ProductDetailScreen = () => {
     }
   };
 
+  const handleAddToFavorites = async () => {
+    let favorites = [...user?.favorites];
+    favorites.push(product._id);
+    dispatch(addToFavories(product._id));
+    const userRef = doc(db, "users", user?.id);
+    await updateDoc(userRef, {
+      favorites: favorites,
+    });
+    setIsFavorite(true);
+  };
+
+  const handleRemoveFromFavorites = async () => {
+    let favorites = [...user?.favorites];
+    const index = favorites.findIndex((item) => item === product._id);
+    let newFavorites = [...favorites];
+    if (index >= 0) {
+      newFavorites.splice(index, 1);
+    } else {
+      console.warn(
+        `Can't remove product (id: ${product._id}) as it is not in favorites!`
+      );
+    }
+    dispatch(removeFromFavorites(product._id));
+    const userRef = doc(db, "users", user.id);
+    await updateDoc(userRef, {
+      favorites: newFavorites,
+    });
+    setIsFavorite(false);
+  };
+
+  useEffect(() => {
+    setSelectedSize(product.sizes[0].name);
+    const found = user?.favorites.includes(product._id);
+    console.log(user?.favorites, product._id, found);
+    if (found) setIsFavorite(true);
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <View>
-        <HeaderBar style={styles.headerBar} />
+        <HeaderBar
+          style={styles.headerBar}
+          isFavorite={isFavorite}
+          addToFavorites={handleAddToFavorites}
+          removeFromFavorites={handleRemoveFromFavorites}
+        />
         <Image
           source={{ uri: urlFor(product.image).url() }}
           style={styles.image}
@@ -92,7 +155,7 @@ const ProductDetailScreen = () => {
           <View className="mr-5">
             <View className="flex-row-reverse items-center justify-between mb-5 fle">
               {product.ingredients.map((ingredient) => (
-                <>
+                <View key={ingredient._id}>
                   <View
                     style={styles.ingredientContainer}
                     className="p-4 rounded-xl"
@@ -107,7 +170,7 @@ const ProductDetailScreen = () => {
                       {ingredient.name}
                     </Text>
                   </View>
-                </>
+                </View>
               ))}
             </View>
             {product.roast && (
@@ -145,14 +208,28 @@ const ProductDetailScreen = () => {
           >
             Sizes
           </Text>
-          <ScrollView horizontal>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {product.sizes?.map((size) => (
-              <TouchableOpacity key={size._id}>
+              <TouchableOpacity
+                key={size._id}
+                onPress={() => setSelectedSize(size.name)}
+              >
                 <View
                   className="p-4 rounded-xl w-28 mr-5"
-                  style={styles.sizeContainerSelected}
+                  style={
+                    size.name === selectedSize
+                      ? styles.sizeContainerSelected
+                      : styles.sizeContainerNotSelected
+                  }
                 >
-                  <Text className="text-center" style={styles.sizeTextSelected}>
+                  <Text
+                    className="text-center"
+                    style={
+                      size.name === selectedSize
+                        ? styles.sizeTextSelected
+                        : styles.sizeTextNotSelected
+                    }
+                  >
                     {size.name}
                   </Text>
                 </View>
@@ -170,7 +247,7 @@ const ProductDetailScreen = () => {
                   $
                 </Text>
                 <Text className="font-bold text-lg text-white">
-                  {addCents(product.price)}
+                  {addCents(priceAdjuster(selectedSize, product.price))}
                 </Text>
               </View>
             </View>
@@ -238,6 +315,14 @@ const styles = StyleSheet.create({
   },
   sizeTextSelected: {
     color: config.color.ORANGE,
+  },
+  sizeContainerNotSelected: {
+    backgroundColor: config.color.GRAY,
+    borderWidth: 2,
+    borderColor: config.color.GRAY,
+  },
+  sizeTextNotSelected: {
+    color: config.color.MD_GRAY,
   },
   textColor: {
     color: config.color.ORANGE,
