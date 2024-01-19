@@ -41,8 +41,8 @@ const ProductCard = ({ product, hasRating }) => {
       <LinearGradient
         className="justify-center rounded-3xl p-3 mr-5"
         colors={[config.color.GRAY, config.color.BLACK]}
-        start={{ x: 0.4, y: 0.4 }}
-        end={{ x: 1, y: 1 }}
+        // start={{ x: 0.4, y: 0.4 }}
+        // end={{ x: 1, y: 1 }}
       >
         <View className="relative">
           {hasRating && (
