@@ -13,11 +13,15 @@ import CartTab from "./CartTab";
 import FavoritesTab from "./FavoritesTab";
 import HistoryTab from "./HistoryTab";
 import { useTheme } from "react-native-paper";
+import { useSelector } from "react-redux";
+import { selectCartItems } from "../feautures/cartSlice";
 
 const HomeScreen = ({ navigation }) => {
   const Tab = createMaterialBottomTabNavigator();
   const theme = useTheme();
   theme.colors.secondaryContainer = "transperent";
+
+  const cart = useSelector(selectCartItems);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -46,12 +50,20 @@ const HomeScreen = ({ navigation }) => {
           component={CartTab}
           options={{
             tabBarIcon: ({ color }) => (
-              <Icon
-                name="shopping-bag"
-                type="font-awesome-5"
-                color={color}
-                size={26}
-              />
+              <View className="relative">
+                {cart.length > 0 && (
+                  <View
+                    className="w-3 h-3 rounded-full absolute -top-1 -right-2 z-50"
+                    style={styles.cartItems}
+                  />
+                )}
+                <Icon
+                  name="shopping-bag"
+                  type="font-awesome-5"
+                  color={color}
+                  size={24}
+                />
+              </View>
             ),
           }}
         />
@@ -101,5 +113,8 @@ const styles = StyleSheet.create({
     height: 55,
     color: config.color.LT_GRAY,
     paddingHorizontal: 20,
+  },
+  cartItems: {
+    backgroundColor: config.color.ORANGE,
   },
 });

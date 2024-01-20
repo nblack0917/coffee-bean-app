@@ -20,3 +20,33 @@ export const priceAdjuster = (size, price) => {
   }
   return priceNum;
 };
+
+export const addCents = (price) => {
+  let currPrice = price.toString();
+  let checkCents = currPrice.split(".");
+  let newPrice;
+  if (checkCents.length > 1) {
+    if (checkCents[1].length === 1) {
+      newPrice = currPrice.concat("0");
+    } else if (checkCents[1].length === 3) {
+      newPrice = price.toString().slice(0, -1);
+    } else {
+      newPrice = price.toString();
+    }
+  } else if (checkCents.length === 1) {
+    newPrice = currPrice.concat(".00");
+  }
+
+  return newPrice;
+};
+
+export const addRatingDecimal = (rating) => {
+  let currRating = rating.toString();
+  let newRating;
+  if (currRating.length === 1) {
+    newRating = currRating.concat(".0");
+  } else {
+    newRating = currRating;
+  }
+  return newRating;
+};

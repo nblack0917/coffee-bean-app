@@ -32,6 +32,7 @@ const RegistrationScreen = ({ navigation }) => {
   const [photoURL, setPhotoURL] = useState("");
   const [image, setImage] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const storageRef = ref(storage, "avatars/" + uuid.v4());
 
@@ -100,6 +101,7 @@ const RegistrationScreen = ({ navigation }) => {
     const match = matchPassword(password, confirmPassword);
 
     if ((name?.length > 0) & (email?.length > 0) && validate.isValid && match) {
+      setLoading(true);
       setErrorMessage("");
       register(name, email, password, photoURL);
     } else {
@@ -204,7 +206,13 @@ const RegistrationScreen = ({ navigation }) => {
             onPress={handleRegister}
           >
             <View className="flex-grow items-center">
-              <Text className="text-white text-xl font-semibold">Register</Text>
+              <Text className="text-white text-xl font-semibold">
+                {loading ? (
+                  <ActivityIndicator size="large" color="#ffffff" />
+                ) : (
+                  "Register"
+                )}
+              </Text>
             </View>
           </TouchableOpacity>
           {errorMessage && (

@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -22,6 +23,7 @@ import { getFavorites } from "../utils/user/getFavorites";
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -53,6 +55,7 @@ const LoginScreen = ({ navigation }) => {
   useEffect(() => {
     const subscriber = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        setLoading(true);
         const newUser = {
           id: user.uid,
           name: user.displayName,
@@ -105,7 +108,13 @@ const LoginScreen = ({ navigation }) => {
         onPress={() => signIn(email, password)}
       >
         <View className="flex-grow items-center">
-          <Text className="text-white text-xl font-semibold">Login</Text>
+          <Text className="text-white text-xl font-semibold">
+            {loading ? (
+              <ActivityIndicator size="large" color="#ffffff" />
+            ) : (
+              "Login"
+            )}
+          </Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity

@@ -18,7 +18,11 @@ import {
   getIngredientIcon,
   getIngredientType,
 } from "../utils/drinks/ingredient";
-import { priceAdjuster } from "../utils/drinks/priceAdjuster";
+import {
+  addCents,
+  addRatingDecimal,
+  priceAdjuster,
+} from "../utils/drinks/priceAdjuster";
 import { db } from "../firebase";
 import {
   addToFavories,
@@ -26,6 +30,7 @@ import {
   selectUser,
 } from "../feautures/userSlice";
 import { doc, updateDoc } from "firebase/firestore";
+import { addToCart, selectCartItems } from "../feautures/cartSlice";
 
 const ProductDetailScreen = () => {
   const [expand, setExpand] = useState(2);
@@ -33,41 +38,12 @@ const ProductDetailScreen = () => {
   const [isFavorite, setIsFavorite] = useState(false);
 
   const user = useSelector(selectUser);
+  const cart = useSelector(selectCartItems);
   const dispatch = useDispatch();
 
   const {
     params: { product },
   } = useRoute();
-
-  const addCents = (price) => {
-    let currPrice = price.toString();
-    let checkCents = currPrice.split(".");
-    let newPrice;
-    if (checkCents.length > 1) {
-      if (checkCents[1].length === 1) {
-        newPrice = currPrice.concat("0");
-      } else if (checkCents[1].length === 3) {
-        newPrice = price.toString().slice(0, -1);
-      } else {
-        newPrice = price.toString();
-      }
-    } else if (checkCents.length === 1) {
-      newPrice = currPrice.concat(".00");
-    }
-
-    return newPrice;
-  };
-
-  const addRatingDecimal = (rating) => {
-    let currRating = rating.toString();
-    let newRating;
-    if (currRating.length === 1) {
-      newRating = currRating.concat(".0");
-    } else {
-      newRating = currRating;
-    }
-    return newRating;
-  };
 
   const handleNumOfLines = () => {
     if (expand === 2) {
@@ -75,6 +51,15 @@ const ProductDetailScreen = () => {
     } else {
       setExpand(2);
     }
+  };
+
+  const handleAddToCart = () => {
+    const itemToAdd = {
+      product: product,
+      size: selectedSize,
+      price: Number(priceAdjuster(selectedSize, product.price)),
+    };
+    dispatch(addToCart(itemToAdd));
   };
 
   const handleAddToFavorites = async () => {
@@ -110,9 +95,12 @@ const ProductDetailScreen = () => {
   useEffect(() => {
     setSelectedSize(product.sizes[0].name);
     const found = user?.favorites.includes(product._id);
-    console.log(user?.favorites, product._id, found);
     if (found) setIsFavorite(true);
-  }, []);
+  }, [user]);
+
+  useEffect(() => {
+    console.log(cart.length);
+  }, [cart]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -187,7 +175,7 @@ const ProductDetailScreen = () => {
         </View>
       </View>
       <ScrollView>
-        <View className="px-4 pt-4">
+        <View className="px-4 py-4">
           <Text
             className="text-white font-medium text-lg"
             style={styles.textHeading}
@@ -236,34 +224,35 @@ const ProductDetailScreen = () => {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          <View className="flex-row items-center mt-6 mb-6">
-            <View>
-              <Text className="text-white text-center font-light">Price</Text>
-              <View className="flex-row items-center">
-                <Text
-                  style={styles.textColor}
-                  className="font-bold text-lg pr-2"
-                >
-                  $
-                </Text>
-                <Text className="font-bold text-lg text-white">
-                  {addCents(priceAdjuster(selectedSize, product.price))}
-                </Text>
-              </View>
-            </View>
-            <View className="flex-1 ml-10 mr-2">
-              <TouchableOpacity
-                style={styles.addToCartContainer}
-                className="py-4 rounded-3xl"
-              >
-                <Text className="text-white font-semibold text-xl text-center">
-                  Add to Cart
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
         </View>
       </ScrollView>
+      <View className="px-4 my-4">
+        <View className="flex-row items-center">
+          <View>
+            <Text className="text-white text-center font-light">Price</Text>
+            <View className="flex-row items-center">
+              <Text style={styles.textColor} className="font-bold text-lg pr-2">
+                $
+              </Text>
+              <Text className="font-bold text-lg text-white">
+                {addCents(priceAdjuster(selectedSize, product.price))}
+              </Text>
+            </View>
+          </View>
+          <View className="flex-1 ml-10 mr-2">
+            <TouchableOpacity
+              style={styles.addToCartContainer}
+              className="py-4 rounded-3xl"
+              onPress={handleAddToCart}
+            >
+              <Text className="text-white font-semibold text-xl text-center">
+                Add to Cart
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+      {/* </View> */}
     </SafeAreaView>
   );
 };

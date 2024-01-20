@@ -75,21 +75,33 @@ const ProductCard = ({ product, hasRating }) => {
           />
         </View>
         <View className="mb-2">
-          <Text className="text-white font-light text-lg pt-3 pb-2 tracking-wide">
+          <Text className="text-white font-light text-lg pt-3 pb-1 tracking-wide">
             {product.name}
           </Text>
-          <Text className="text-white text-xs font-extralight">
+          <Text className="text-white text-xs font-extralight pb-1">
             {product.subtext}
           </Text>
         </View>
         <View className="flex-row items-center justify-between">
-          <View className="flex-row items center">
-            <Text style={styles.textColor} className="font-bold text-lg pr-2">
-              $
-            </Text>
-            <Text className="font-bold text-lg text-white">
-              {addCents(product.price)}
-            </Text>
+          <View className="flex items-center">
+            {hasRating && (
+              <Text className="font-extralight text-white text-xs text-center">
+                Starting at
+              </Text>
+            )}
+            <View className="flex-row items center">
+              <Text style={styles.textColor} className="font-bold text-lg pr-2">
+                $
+              </Text>
+              <Text className="font-bold text-lg text-white">
+                {addCents(product.price)}
+              </Text>
+            </View>
+            {!hasRating && (
+              <Text className="font-extralight text-white text-xs text-center">
+                per pound
+              </Text>
+            )}
           </View>
           <TouchableOpacity
             className="w-8 h-8 items-center justify-center p-1 rounded-lg"
