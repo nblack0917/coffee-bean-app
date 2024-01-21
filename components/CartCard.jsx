@@ -1,12 +1,28 @@
-import { Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useMemo, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { urlFor } from "../sanity";
 import { addCents, priceAdjuster } from "../utils/drinks/priceAdjuster";
 import { Icon } from "@rneui/themed";
+import { addToCart, removeFromCart } from "../feautures/cartSlice";
+import { useDispatch } from "react-redux";
 
 const CartCard = ({ cartItems }) => {
-  console.log(cartItems);
+  const [groupedSizes, setGroupedSizes] = useState([]);
+
+  const dispatch = useDispatch();
+
+  useMemo(() => {
+    const grouped = cartItems.reduce((results, item) => {
+      (results[item.size] = results[item.size] || []).push(item);
+      return results;
+    }, {});
+
+    setGroupedSizes(grouped);
+  }, [cartItems]);
+
+  console.log(groupedSizes);
+
   return (
     <View className="w-full">
       <LinearGradient
@@ -43,15 +59,18 @@ const CartCard = ({ cartItems }) => {
           </View>
         </View>
         <View className="">
-          {cartItems.map((item) => (
-            <View className="flex-row items-center mt-3">
+          {Object.entries(groupedSizes).map(([key, items]) => (
+            <View
+              key={`${items[0].product._id}${key}`}
+              className="flex-row items-center mt-3"
+            >
               <View
                 className="rounded-xl w-24 py-3"
                 style={styles.sizeContainer}
               >
-                <Text className="text-center text-white">{item.size}</Text>
+                <Text className="text-center text-white">{key}</Text>
               </View>
-              <View className="flex-row items-center ml-5">
+              <View className="flex-row items-center mx-5">
                 <Text
                   style={styles.textColor}
                   className="font-bold text-lg pr-2"
@@ -59,27 +78,44 @@ const CartCard = ({ cartItems }) => {
                   $
                 </Text>
                 <Text className="font-bold text-lg text-white">
-                  {addCents(item.price)}
+                  {addCents(items[0].price)}
                 </Text>
               </View>
-              <View className="flex-row items-center justify-evenly">
-                <View className="p-2  rounded" style={styles.incrementWrapper}>
+              <View className="flex-1 flex-row items-center justify-between">
+                <TouchableOpacity
+                  className="p-2 rounded-xl"
+                  style={styles.incrementWrapper}
+                  onPress={() =>
+                    dispatch(
+                      removeFromCart({ id: items[0].product._id, size: key })
+                    )
+                  }
+                >
                   <Icon
                     name="minus"
                     type="font-awesome-5"
                     size={18}
                     color="white"
                   />
+                </TouchableOpacity>
+                <View
+                  className="px-5 py-2 rounded-xl"
+                  style={styles.numberWrapper}
+                >
+                  <Text className="text-white">{items.length}</Text>
                 </View>
-                <View></View>
-                <View className="p-2 rounded" style={styles.incrementWrapper}>
+                <TouchableOpacity
+                  className="p-2 rounded-xl"
+                  style={styles.incrementWrapper}
+                  onPress={() => dispatch(addToCart(items[0]))}
+                >
                   <Icon
                     name="plus"
                     type="font-awesome-5"
                     size={18}
                     color="white"
                   />
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
           ))}
@@ -103,6 +139,11 @@ const styles = StyleSheet.create({
   },
   incrementWrapper: {
     backgroundColor: config.color.ORANGE,
+  },
+  numberWrapper: {
+    backgroundColor: config.color.BLACK,
+    borderWidth: 1,
+    borderColor: config.color.ORANGE,
   },
 });
 

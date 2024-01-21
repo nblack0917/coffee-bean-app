@@ -6,9 +6,14 @@ import sanityClient, { urlFor } from "../sanity";
 
 import config from "../config";
 import { useNavigation } from "@react-navigation/native";
+import { priceAdjuster } from "../utils/drinks/priceAdjuster";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../feautures/cartSlice";
 
 const ProductCard = ({ product, hasRating }) => {
   const navigation = useNavigation();
+
+  const dispatch = useDispatch();
 
   const addCents = (price) => {
     let currPrice = price.toString();
@@ -32,6 +37,16 @@ const ProductCard = ({ product, hasRating }) => {
       newRating = currRating;
     }
     return newRating;
+  };
+
+  const handleAddToCart = () => {
+    const selectedSize = product.sizes?.[0].name;
+    const itemToAdd = {
+      product: product,
+      size: selectedSize,
+      price: Number(priceAdjuster(selectedSize, product.price)),
+    };
+    dispatch(addToCart(itemToAdd));
   };
 
   return (
@@ -106,6 +121,7 @@ const ProductCard = ({ product, hasRating }) => {
           <TouchableOpacity
             className="w-8 h-8 items-center justify-center p-1 rounded-lg"
             style={styles.addContainer}
+            onPress={() => handleAddToCart()}
           >
             <Icon name="plus" type="antdesign" size={18} color="white" />
           </TouchableOpacity>
