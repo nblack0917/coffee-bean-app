@@ -17,8 +17,14 @@ import { auth } from "../firebase";
 import { signIn } from "../utils/auth/signIn";
 import { useDispatch } from "react-redux";
 
-import { setFavorites, setUser } from "../feautures/userSlice";
+import {
+  setFavorites,
+  setPaymentMethods,
+  setUser,
+} from "../feautures/userSlice";
 import { getFavorites } from "../utils/user/getFavorites";
+import { updatePayments } from "../utils/auth/updatePayment";
+import { getPaymentMethods } from "../utils/user/getPaymentMethods";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -62,10 +68,15 @@ const LoginScreen = ({ navigation }) => {
           email: user.email,
           photoURL: user.photoURL,
           favorites: [],
+          paymentMethods: [],
+          orderHistory: [],
         };
         dispatch(setUser(newUser));
         const faves = await getFavorites(newUser);
         dispatch(setFavorites(faves));
+        const methods = await getPaymentMethods(newUser);
+        dispatch(setPaymentMethods(methods));
+        // updatePayments(newUser);
         navigation.replace("Home");
       }
     });

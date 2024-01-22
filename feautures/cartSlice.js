@@ -2,6 +2,17 @@ import { createSelector, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   items: [],
+  checkout: {
+    id: null,
+    items: [],
+    subtotal: null,
+    tax: null,
+    total: null,
+    paymentMethod: null,
+    last4Digits: null,
+    paymentStatus: null,
+    timestamp: null,
+  },
 };
 
 export const cartSlice = createSlice({
@@ -33,13 +44,46 @@ export const cartSlice = createSlice({
     clearCart: (state) => {
       state.items = [];
     },
+    addToCheckout: (state, action) => {
+      state.checkout = action.payload.checkout;
+    },
+    completeCheckout: (state, action) => {
+      let tempCheckout = state.checkout;
+      tempCheckout.paymentMethod = action.payload.paymentMethod;
+      tempCheckout.last4Digits = action.payload.last4Digits;
+      tempCheckout.paymentStatus = action.payload.last4Digits;
+      tempCheckout.timestamp = new Date();
+      state.checkout = tempCheckout;
+    },
+    clearCheckout: (state) => {
+      state.checkout = {
+        id: null,
+        items: [],
+        subtotal: null,
+        tax: null,
+        total: null,
+        paymentMethod: null,
+        last4Digits: null,
+        paymentStatus: null,
+        timestamp: null,
+      };
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { addToCart, removeFromCart, clearCart } = cartSlice.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  clearCart,
+  addToCheckout,
+  completeCheckout,
+  clearCheckout,
+} = cartSlice.actions;
 
 export const selectCartItems = (state) => state.cart.items;
+
+export const selectCheckout = (state) => state.cart.checkout;
 
 export const selectCartItemsWithId = createSelector(
   (state) => state,

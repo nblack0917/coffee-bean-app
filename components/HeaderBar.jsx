@@ -89,6 +89,35 @@ const HeaderBar = ({
             />
           </>
         </View>
+      ) : route.name === "Payment" ? (
+        <View
+          // style={style}
+          className="flex-row items-center justify-between mx-6 mt-5"
+        >
+          <>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              className="rounded-2xl p-0.5"
+              style={styles.backContainer}
+            >
+              <Icon
+                name="chevron-left"
+                type="material-community"
+                size={32}
+                color={config.color.MD_GRAY}
+              />
+            </TouchableOpacity>
+            {route.name !== "HomeTab" && (
+              <Text className="text-white font-bold text-2xl tracking-widest">
+                {route.name}
+              </Text>
+            )}
+            <Avatar
+              rounded
+              source={{ uri: auth.currentUser?.photoURL ?? defaultURL }}
+            />
+          </>
+        </View>
       ) : (
         <View className="absolute top-12 w-full z-50">
           <View className="flex-row items-center justify-between mx-6 mt-5">
@@ -106,7 +135,7 @@ const HeaderBar = ({
                 />
               </TouchableOpacity>
               <View className="flex-row items-center">
-                {cart.length > 0 && (
+                {cart.length > 0 && route.name !== "Payment" && (
                   <TouchableOpacity
                     className="items-center justify-center rounded-full mr-4 relative"
                     // style={styles.cartContainer}

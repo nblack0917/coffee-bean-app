@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { selectUser } from "../feautures/userSlice";
 import FavoriteCard from "../components/FavoriteCard";
 import { selectBeans, selectDrinks } from "../feautures/drinksSlice";
+import NoFavorites from "../components/NoFavorites";
 
 const FavoritesTab = () => {
   const [favoriteDrinks, setFavoriteDrinks] = useState([]);
@@ -36,19 +37,23 @@ const FavoritesTab = () => {
     }
   }, [user]);
 
-  console.log(user.favorites);
-
   return (
     <View style={styles.container} className="flex-1">
       <HeaderBar />
-      <ScrollView className="mt-6">
-        {favoriteDrinks?.map((favorite) => (
-          <FavoriteCard key={favorite._id} favorite={favorite} />
-        ))}
-        {favoriteBeans?.map((favorite) => (
-          <FavoriteCard key={favorite._id} favorite={favorite} />
-        ))}
-      </ScrollView>
+      {favoriteDrinks.length > 0 ? (
+        <ScrollView className="mt-6">
+          {favoriteDrinks?.map((favorite) => (
+            <FavoriteCard key={favorite._id} favorite={favorite} />
+          ))}
+          {favoriteBeans?.map((favorite) => (
+            <FavoriteCard key={favorite._id} favorite={favorite} />
+          ))}
+        </ScrollView>
+      ) : (
+        <>
+          <NoFavorites />
+        </>
+      )}
     </View>
   );
 };

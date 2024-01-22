@@ -28,8 +28,9 @@ export const addCents = (price) => {
   if (checkCents.length > 1) {
     if (checkCents[1].length === 1) {
       newPrice = currPrice.concat("0");
-    } else if (checkCents[1].length === 3) {
-      newPrice = price.toString().slice(0, -1);
+    } else if (checkCents[1].length >= 3) {
+      const toRemove = Number(`-${checkCents[1].length - 2}`);
+      newPrice = price.toString().slice(0, toRemove);
     } else {
       newPrice = price.toString();
     }

@@ -6,7 +6,11 @@ import sanityClient, { urlFor } from "../sanity";
 
 import config from "../config";
 import { useNavigation } from "@react-navigation/native";
-import { priceAdjuster } from "../utils/drinks/priceAdjuster";
+import {
+  addCents,
+  priceAdjuster,
+  addRatingDecimal,
+} from "../utils/drinks/priceAdjuster";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../feautures/cartSlice";
 
@@ -14,30 +18,6 @@ const ProductCard = ({ product, hasRating }) => {
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
-
-  const addCents = (price) => {
-    let currPrice = price.toString();
-    let newPrice;
-    if (currPrice.length === 3) {
-      newPrice = currPrice.concat("0");
-    } else if (currPrice.length === 1) {
-      newPrice = currPrice.concat(".00");
-    } else {
-      newPrice = price.toString();
-    }
-    return newPrice;
-  };
-
-  const addRatingDecimal = (rating) => {
-    let currRating = rating.toString();
-    let newRating;
-    if (currRating.length === 1) {
-      newRating = currRating.concat(".0");
-    } else {
-      newRating = currRating;
-    }
-    return newRating;
-  };
 
   const handleAddToCart = () => {
     const selectedSize = product.sizes?.[0].name;

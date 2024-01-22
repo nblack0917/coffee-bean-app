@@ -21,105 +21,199 @@ const CartCard = ({ cartItems }) => {
     setGroupedSizes(grouped);
   }, [cartItems]);
 
-  console.log(groupedSizes);
+  const sizeKeys = Object.entries(groupedSizes);
 
   return (
     <View className="w-full">
       <LinearGradient
         colors={[config.color.GRAY, "#181e29"]}
-        className=" rounded-3xl mx-4 p-4 my-4"
+        className=" rounded-3xl mx-4 p-4 mb-6"
       >
-        <View className="flex-row">
-          <Image
-            source={{
-              uri: urlFor(cartItems[0]?.product.image).url(),
-            }}
-            width={110}
-            height={110}
-            resizeMode="cover"
-            style={{ borderRadius: 25 }}
-          />
-          <View className="flex-1 px-5">
-            <Text className="text-white text-lg">
-              {cartItems[0]?.product.name}
-            </Text>
-            <Text className="text-white font-extralight text-xs mt-1">
-              {cartItems[0]?.product.subtext}
-            </Text>
-            {cartItems[0]?.product.roast && (
-              <View
-                style={styles.roastContainer}
-                className="py-4 rounded-xl w-32 mt-3"
-              >
-                <Text className="text-white text-xs font-light text-center">
-                  {cartItems[0]?.product.roast?.[0]?.name} Roasted
+        {sizeKeys.length > 1 ? (
+          <>
+            <View className="flex-row">
+              <Image
+                source={{
+                  uri: urlFor(cartItems[0]?.product.image).url(),
+                }}
+                width={110}
+                height={110}
+                resizeMode="cover"
+                style={{ borderRadius: 25 }}
+              />
+              <View className="flex-1 px-5">
+                <Text className="text-white text-lg">
+                  {cartItems[0]?.product.name}
                 </Text>
-              </View>
-            )}
-          </View>
-        </View>
-        <View className="">
-          {Object.entries(groupedSizes).map(([key, items]) => (
-            <View
-              key={`${items[0].product._id}${key}`}
-              className="flex-row items-center mt-3"
-            >
-              <View
-                className="rounded-xl w-24 py-3"
-                style={styles.sizeContainer}
-              >
-                <Text className="text-center text-white">{key}</Text>
-              </View>
-              <View className="flex-row items-center mx-5">
-                <Text
-                  style={styles.textColor}
-                  className="font-bold text-lg pr-2"
-                >
-                  $
+                <Text className="text-white font-extralight text-xs mt-1">
+                  {cartItems[0]?.product.subtext}
                 </Text>
-                <Text className="font-bold text-lg text-white">
-                  {addCents(items[0].price)}
-                </Text>
-              </View>
-              <View className="flex-1 flex-row items-center justify-between">
-                <TouchableOpacity
-                  className="p-2 rounded-xl"
-                  style={styles.incrementWrapper}
-                  onPress={() =>
-                    dispatch(
-                      removeFromCart({ id: items[0].product._id, size: key })
-                    )
-                  }
-                >
-                  <Icon
-                    name="minus"
-                    type="font-awesome-5"
-                    size={18}
-                    color="white"
-                  />
-                </TouchableOpacity>
-                <View
-                  className="px-5 py-2 rounded-xl"
-                  style={styles.numberWrapper}
-                >
-                  <Text className="text-white">{items.length}</Text>
-                </View>
-                <TouchableOpacity
-                  className="p-2 rounded-xl"
-                  style={styles.incrementWrapper}
-                  onPress={() => dispatch(addToCart(items[0]))}
-                >
-                  <Icon
-                    name="plus"
-                    type="font-awesome-5"
-                    size={18}
-                    color="white"
-                  />
-                </TouchableOpacity>
+                {cartItems[0]?.product.roast && (
+                  <View
+                    style={styles.roastContainer}
+                    className="py-4 rounded-xl w-32 mt-3"
+                  >
+                    <Text className="text-white text-xs font-light text-center">
+                      {cartItems[0]?.product.roast?.[0]?.name} Roasted
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
-          ))}
-        </View>
+            <View className="">
+              {Object.entries(groupedSizes).map(([key, items]) => (
+                <View
+                  key={`${items[0].product._id}${key}`}
+                  className="flex-row items-center mt-3"
+                >
+                  <View
+                    className="rounded-xl w-24 py-3"
+                    style={styles.sizeContainer}
+                  >
+                    <Text className="text-center text-white">{key}</Text>
+                  </View>
+                  <View className="flex-row items-center mx-5">
+                    <Text
+                      style={styles.textColor}
+                      className="font-bold text-lg pr-2"
+                    >
+                      $
+                    </Text>
+                    <Text className="font-bold text-lg text-white">
+                      {addCents(items[0].price)}
+                    </Text>
+                  </View>
+                  <View className="flex-1 flex-row items-center justify-between">
+                    <TouchableOpacity
+                      className="p-2 rounded-xl"
+                      style={styles.incrementWrapper}
+                      onPress={() =>
+                        dispatch(
+                          removeFromCart({
+                            id: items[0].product._id,
+                            size: key,
+                          })
+                        )
+                      }
+                    >
+                      <Icon
+                        name="minus"
+                        type="font-awesome-5"
+                        size={18}
+                        color="white"
+                      />
+                    </TouchableOpacity>
+                    <View
+                      className="px-5 py-2 rounded-xl"
+                      style={styles.numberWrapper}
+                    >
+                      <Text className="text-white">{items.length}</Text>
+                    </View>
+                    <TouchableOpacity
+                      className="p-2 rounded-xl"
+                      style={styles.incrementWrapper}
+                      onPress={() => dispatch(addToCart(items[0]))}
+                    >
+                      <Icon
+                        name="plus"
+                        type="font-awesome-5"
+                        size={18}
+                        color="white"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        ) : (
+          <>
+            <View className="flex-row">
+              <Image
+                source={{
+                  uri: urlFor(cartItems[0]?.product.image).url(),
+                }}
+                width={150}
+                height={150}
+                resizeMode="cover"
+                style={{ borderRadius: 25 }}
+              />
+              <View className="flex-1 px-5">
+                <Text className="text-white text-lg">
+                  {cartItems[0]?.product.name}
+                </Text>
+                <Text className="text-white font-extralight text-xs mt-1">
+                  {cartItems[0]?.product.subtext}
+                </Text>
+                {Object.entries(groupedSizes).map(([key, items]) => (
+                  <View key={`${items[0].product._id}${key}`}>
+                    <View className="flex-row items-center mt-3">
+                      <View
+                        className="rounded-xl w-24 py-3"
+                        style={styles.sizeContainer}
+                      >
+                        <Text className="text-center text-white">{key}</Text>
+                      </View>
+                      <View className="flex-row items-center mx-5">
+                        <Text
+                          style={styles.textColor}
+                          className="font-bold text-lg pr-2"
+                        >
+                          $
+                        </Text>
+                        <Text className="font-bold text-lg text-white">
+                          {addCents(items[0].price)}
+                        </Text>
+                      </View>
+                    </View>
+                    <View className="flex-row items-center mt-3">
+                      <View className="flex-1 flex-row items-center justify-between">
+                        <TouchableOpacity
+                          className="p-2 rounded-xl"
+                          style={styles.incrementWrapper}
+                          onPress={() =>
+                            dispatch(
+                              removeFromCart({
+                                id: items[0].product._id,
+                                size: key,
+                              })
+                            )
+                          }
+                        >
+                          <Icon
+                            name="minus"
+                            type="font-awesome-5"
+                            size={18}
+                            color="white"
+                          />
+                        </TouchableOpacity>
+                        <View
+                          className="px-5 py-2 rounded-xl"
+                          style={styles.numberWrapper}
+                        >
+                          <Text className="text-white">{items.length}</Text>
+                        </View>
+                        <TouchableOpacity
+                          className="p-2 rounded-xl"
+                          style={styles.incrementWrapper}
+                          onPress={() => dispatch(addToCart(items[0]))}
+                        >
+                          <Icon
+                            name="plus"
+                            type="font-awesome-5"
+                            size={18}
+                            color="white"
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </View>
+            <View className=""></View>
+          </>
+        )}
       </LinearGradient>
     </View>
   );

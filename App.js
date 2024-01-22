@@ -9,6 +9,7 @@ import RegistrationScreen from "./screens/RegistrationScreen";
 import ProductDetailScreen from "./screens/ProductDetailScreen";
 import { Provider } from "react-redux";
 import store from "./store";
+import PaymentScreen from "./screens/PaymentScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,7 @@ export default function App() {
               name="ProductDetail"
               component={ProductDetailScreen}
             />
+            <Stack.Screen name="Payment" component={PaymentScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>

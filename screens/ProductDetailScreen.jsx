@@ -98,10 +98,6 @@ const ProductDetailScreen = () => {
     if (found) setIsFavorite(true);
   }, [user]);
 
-  useEffect(() => {
-    console.log(cart.length);
-  }, [cart]);
-
   return (
     <SafeAreaView style={styles.container}>
       <View>

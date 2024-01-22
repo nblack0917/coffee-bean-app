@@ -7,6 +7,8 @@ const initialState = {
     email: "",
     photoURL: "",
     favorites: [],
+    paymentMethods: [],
+    orderHistory: [],
   },
 };
 
@@ -40,12 +42,20 @@ export const userSlice = createSlice({
 
       state.user.favorites = newFavorites;
     },
+    setPaymentMethods: (state, action) => {
+      state.user.paymentMethods = action.payload.paymentMethods;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { addToFavories, removeFromFavorites, setUser, setFavorites } =
-  userSlice.actions;
+export const {
+  addToFavories,
+  removeFromFavorites,
+  setUser,
+  setFavorites,
+  setPaymentMethods,
+} = userSlice.actions;
 
 export const selectUser = (state) => state.user.user;
 
