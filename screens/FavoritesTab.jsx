@@ -51,7 +51,7 @@ const FavoritesTab = () => {
         </ScrollView>
       ) : (
         <>
-          <NoFavorites />
+          <NoFavorites favorite={true} />
         </>
       )}
     </View>

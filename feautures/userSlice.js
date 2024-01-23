@@ -45,6 +45,12 @@ export const userSlice = createSlice({
     setPaymentMethods: (state, action) => {
       state.user.paymentMethods = action.payload.paymentMethods;
     },
+    addToOrderHistory: (state, action) => {
+      state.user.orderHistory = [...state.user.orderHistory, action.payload];
+    },
+    setOrderHistory: (state, action) => {
+      state.user.orderHistory = action.payload;
+    },
   },
 });
 
@@ -55,8 +61,12 @@ export const {
   setUser,
   setFavorites,
   setPaymentMethods,
+  addToOrderHistory,
+  setOrderHistory,
 } = userSlice.actions;
 
 export const selectUser = (state) => state.user.user;
+
+export const selectHistory = (state) => state.user.user.orderHistory;
 
 export default userSlice.reducer;

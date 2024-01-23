@@ -138,4 +138,7 @@ const styles = StyleSheet.create({
   smallText: {
     color: config.color.LT_GRAY,
   },
+  textColor: {
+    color: config.color.ORANGE,
+  },
 });

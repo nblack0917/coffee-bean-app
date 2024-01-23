@@ -52,7 +52,7 @@ export const cartSlice = createSlice({
       tempCheckout.paymentMethod = action.payload.paymentMethod;
       tempCheckout.last4Digits = action.payload.last4Digits;
       tempCheckout.paymentStatus = action.payload.last4Digits;
-      tempCheckout.timestamp = new Date();
+      //   tempCheckout.timestamp = new Date();
       state.checkout = tempCheckout;
     },
     clearCheckout: (state) => {

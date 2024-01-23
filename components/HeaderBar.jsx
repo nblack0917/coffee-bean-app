@@ -89,7 +89,7 @@ const HeaderBar = ({
             />
           </>
         </View>
-      ) : route.name === "Payment" ? (
+      ) : route.name === "Payment" || route.name === "Order History" ? (
         <View
           // style={style}
           className="flex-row items-center justify-between mx-6 mt-5"

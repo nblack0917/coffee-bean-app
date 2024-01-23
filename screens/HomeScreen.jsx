@@ -77,7 +77,7 @@ const HomeScreen = ({ navigation }) => {
           }}
         />
         <Tab.Screen
-          name="History"
+          name="Order History"
           component={HistoryTab}
           options={{
             tabBarIcon: ({ color }) => (

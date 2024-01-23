@@ -19,12 +19,14 @@ import { useDispatch } from "react-redux";
 
 import {
   setFavorites,
+  setOrderHistory,
   setPaymentMethods,
   setUser,
 } from "../feautures/userSlice";
 import { getFavorites } from "../utils/user/getFavorites";
 import { updatePayments } from "../utils/auth/updatePayment";
 import { getPaymentMethods } from "../utils/user/getPaymentMethods";
+import { getOrderHistory } from "../utils/user/getOrderHistory";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -32,31 +34,6 @@ const LoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
-
-  // onAuthStateChanged(auth, (user) => {
-  //   if (user) {
-  //     const newUser = {
-  //       id: user.uid,
-  //       name: user.displayName,
-  //       email: user.email,
-  //       photoURL: user.photoURL,
-  //       favorites: [],
-  //     };
-  //     // console.log("user", user);
-  //     dispatch(
-  //       setUser({
-  //         id: user.uid,
-  //         name: user.displayName,
-  //         email: user.email,
-  //         photoURL: user.photoURL,
-  //         favorites: [],
-  //       })
-  //     );
-  //     const faves = getFavorites(newUser);
-  //     dispatch(setFavorites(faves));
-  //     navigation.replace("Home");
-  //   }
-  // });
 
   useEffect(() => {
     const subscriber = onAuthStateChanged(auth, async (user) => {
@@ -76,6 +53,8 @@ const LoginScreen = ({ navigation }) => {
         dispatch(setFavorites(faves));
         const methods = await getPaymentMethods(newUser);
         dispatch(setPaymentMethods(methods));
+        const history = await getOrderHistory(newUser);
+        dispatch(setOrderHistory(history));
         // updatePayments(newUser);
         navigation.replace("Home");
       }

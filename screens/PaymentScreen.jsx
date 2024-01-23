@@ -1,18 +1,26 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import config from "../config";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { LinearGradient } from "expo-linear-gradient";
-import { selectCheckout } from "../feautures/cartSlice";
+import {
+  clearCart,
+  clearCheckout,
+  selectCartItems,
+  selectCheckout,
+} from "../feautures/cartSlice";
 import HeaderBar from "../components/HeaderBar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { addCents } from "../utils/drinks/priceAdjuster.js";
 import { Icon } from "@rneui/themed";
-import { selectUser } from "../feautures/userSlice";
+import uuid from "react-native-uuid";
+import { addToOrderHistory, selectUser } from "../feautures/userSlice";
 import PaymentOption from "../components/PaymentOption.jsx";
 import PaymentProcessing from "../components/PaymentProcessing.jsx";
+import { addToFBOrderHistory } from "../utils/user/getOrderHistory.js";
+import { serverTimestamp } from "firebase/firestore";
 
-const PaymentScreen = () => {
+const PaymentScreen = ({ navigation }) => {
   const [selectedPaymentOption, setSelectedPaymentOption] =
     useState("Credit Card");
   const [availablePaymentMethods, setAvailablePaymentMethods] = useState([]);
@@ -20,9 +28,41 @@ const PaymentScreen = () => {
 
   const checkoutInfo = useSelector(selectCheckout);
   const user = useSelector(selectUser);
+  const dispatch = useDispatch();
 
-  const handlePay = () => {
+  const handlePay = async () => {
+    let lastFour;
+    if (selectedPaymentOption === "Credit Card") {
+      const index = availablePaymentMethods.findIndex(
+        (payment) => payment.name === selectedPaymentOption
+      );
+      if (index >= 0) {
+        lastFour = availablePaymentMethods[index].ccNum.substr(
+          availablePaymentMethods[index].ccNum.length - 4
+        );
+      }
+    }
+    const currDate = new Date().toString();
+    const finalize = {
+      id: uuid.v4(),
+      items: checkoutInfo.items,
+      subtotal: checkoutInfo.subtotal,
+      tax: checkoutInfo.tax,
+      total: checkoutInfo.total,
+      paymentMethod: selectedPaymentOption,
+      last4Digits: lastFour ?? null,
+      paymentStatus: "success",
+      timestamp: currDate,
+    };
     setAcceptPayment(true);
+    console.log(finalize);
+    dispatch(addToOrderHistory(finalize));
+    await addToFBOrderHistory(user, finalize);
+    dispatch(clearCart());
+    dispatch(clearCheckout());
+    setTimeout(() => {
+      navigation.navigate("Order History");
+    }, 5000);
   };
 
   useEffect(() => {
