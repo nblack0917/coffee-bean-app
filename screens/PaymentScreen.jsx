@@ -55,7 +55,6 @@ const PaymentScreen = ({ navigation }) => {
       timestamp: currDate,
     };
     setAcceptPayment(true);
-    console.log(finalize);
     dispatch(addToOrderHistory(finalize));
     await addToFBOrderHistory(user, finalize);
     dispatch(clearCart());

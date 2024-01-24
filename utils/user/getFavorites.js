@@ -5,7 +5,6 @@ export const getFavorites = async (user) => {
   const docRef = doc(db, "users", user.id);
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
-    // console.log("Document data:", docSnap.data().favorites);
     return docSnap.data()?.favorites;
   } else {
     // docSnap.data() will be undefined in this case

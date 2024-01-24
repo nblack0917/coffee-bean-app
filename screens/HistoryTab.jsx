@@ -15,21 +15,16 @@ const HistoryTab = () => {
   useEffect(() => {
     const orderCopy = [...orderHistory];
     let sortedDates = orderCopy?.sort(function (a, b) {
-      // Turn your strings into dates, and then subtract them
-      // to get a value that is either negative, positive, or zero.
-      // console.log(new Date(a.timestamp));
       return new Date(b.timestamp) - new Date(a.timestamp);
     });
     setSortedOrders(sortedDates);
   }, [orderHistory]);
 
-  console.log(sortedOrders);
-
   return (
     <View className="flex-1" style={styles.container}>
       <HeaderBar />
       {orderHistory.length > 0 ? (
-        <ScrollView className="px-3 py-6">
+        <ScrollView className="px-3 py-6 mt-4">
           {sortedOrders?.map((order) => (
             <HistoryCard key={order.id} order={order} />
           ))}

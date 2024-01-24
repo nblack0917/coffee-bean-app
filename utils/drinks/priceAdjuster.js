@@ -1,4 +1,4 @@
-export const priceAdjuster = (size, price) => {
+export const priceAdjuster = (size, price, options = 0) => {
   let priceNum = price;
   if (typeof price === "string") {
     priceNum = Number(price);
@@ -14,9 +14,9 @@ export const priceAdjuster = (size, price) => {
   };
 
   if (size === "1/2 lb." || size === "1 lb." || size === "2 lbs.") {
-    priceNum = priceNum * adjustments[size];
+    priceNum = priceNum * adjustments[size] + options;
   } else {
-    priceNum = priceNum + adjustments[size];
+    priceNum = priceNum + adjustments[size] + options;
   }
   return priceNum;
 };

@@ -22,9 +22,19 @@ const ProductCard = ({ product, hasRating }) => {
   const handleAddToCart = () => {
     const selectedSize = product.sizes?.[0].name;
     const itemToAdd = {
-      product: product,
+      product: {
+        _id: product._id,
+        name: product.name,
+        subtext: product.subtext,
+        image: product.image,
+        price: product.price,
+        roast: product.roast?.[0]?.name,
+        rating: product.rating,
+      },
       size: selectedSize,
+      options: [],
       price: Number(priceAdjuster(selectedSize, product.price)),
+      quantity: 1,
     };
     dispatch(addToCart(itemToAdd));
   };

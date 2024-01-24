@@ -31,11 +31,14 @@ import {
 } from "../feautures/userSlice";
 import { doc, updateDoc } from "firebase/firestore";
 import { addToCart, selectCartItems } from "../feautures/cartSlice";
+import Addons from "../components/Addons";
 
 const ProductDetailScreen = () => {
   const [expand, setExpand] = useState(2);
   const [selectedSize, setSelectedSize] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
+  const [options, setOptions] = useState([]);
+  const [optionsValue, setOptionsValue] = useState(0);
 
   const user = useSelector(selectUser);
   const cart = useSelector(selectCartItems);
@@ -53,11 +56,61 @@ const ProductDetailScreen = () => {
     }
   };
 
+  const handleAddOption = (option) => {
+    let optionCount = 1;
+    // let existingOption = options.filter((item) => option._id === item._id);
+    let currOptions = [...options];
+    const index = currOptions.findIndex((item) => item._id === option._id);
+    let newOption = {
+      _id: option._id,
+      name: option.name,
+      price: option.price,
+      quantity: optionCount,
+    };
+    if (index >= 0) {
+      currOptions[index].quantity = optionCount + currOptions[index]?.quantity;
+      setOptions(currOptions);
+    } else {
+      setOptions([...options, newOption]);
+    }
+  };
+
+  const handleRemoveOption = (option) => {
+    let currOptions = [...options];
+    const index = currOptions.findIndex((item) => item._id === option._id);
+    if (index >= 0) {
+      if (currOptions[index]?.quantity > 1) {
+        currOptions[index].quantity = currOptions[index]?.quantity - 1;
+        setOptions(currOptions);
+      } else if (currOptions[index]?.quantity === 1) {
+        currOptions.splice(index, 1);
+        setOptions(currOptions);
+      }
+    } else {
+      return;
+    }
+  };
+
+  const handleClearOptions = () => {
+    setOptions([]);
+    setOptionsValue(0);
+  };
+
   const handleAddToCart = () => {
     const itemToAdd = {
-      product: product,
+      product: {
+        _id: product._id,
+        name: product.name,
+        subtext: product.subtext,
+        image: product.image,
+        price: product.price,
+        roast: product.roast?.[0]?.name,
+        rating: product.rating,
+      },
       size: selectedSize,
-      price: Number(priceAdjuster(selectedSize, product.price)),
+      options: options,
+      price: Number(priceAdjuster(selectedSize, product.price, optionsValue)),
+      quantity: 1,
     };
     dispatch(addToCart(itemToAdd));
   };
@@ -97,6 +150,16 @@ const ProductDetailScreen = () => {
     const found = user?.favorites.includes(product._id);
     if (found) setIsFavorite(true);
   }, [user]);
+
+  useEffect(() => {
+    let currentValue = 0;
+    if (options.length > 0) {
+      options.forEach((option) => {
+        currentValue = currentValue + option.price * option.quantity;
+      });
+    }
+    setOptionsValue(currentValue);
+  }, [options]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -220,6 +283,28 @@ const ProductDetailScreen = () => {
               </TouchableOpacity>
             ))}
           </ScrollView>
+          <View className="flex-row py-4 items-center justify-between w-full">
+            <Text
+              className="text-white font-medium text-lg"
+              style={styles.textHeading}
+            >
+              Options
+            </Text>
+            <TouchableOpacity onPress={handleClearOptions}>
+              <Text className="font-light" style={styles.textColor}>
+                Clear Options
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {product.addons?.map((addon) => (
+            <Addons
+              item={addon}
+              key={addon._id}
+              handleAddOption={handleAddOption}
+              handleRemoveOption={handleRemoveOption}
+              options={options}
+            />
+          ))}
         </View>
       </ScrollView>
       <View className="px-4 my-4">
@@ -231,7 +316,9 @@ const ProductDetailScreen = () => {
                 $
               </Text>
               <Text className="font-bold text-lg text-white">
-                {addCents(priceAdjuster(selectedSize, product.price))}
+                {addCents(
+                  priceAdjuster(selectedSize, product.price, optionsValue)
+                )}
               </Text>
             </View>
           </View>

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useMemo, useState } from "react";
+import uuid from "react-native-uuid";
 import config from "../config";
 import { addCents } from "../utils/drinks/priceAdjuster";
 
@@ -15,55 +16,81 @@ const HistorySizeCard = ({ items }) => {
     setGroupedSizes(grouped);
   }, [items]);
 
-  //   console.log(groupedSizes);
   return (
     <View>
-      {Object.entries(groupedSizes).map(([key, size]) => (
-        <View
-          className="flex-row w-full items-center justify-between pb-5"
-          key={`${key}${size}`}
-        >
-          <View className="flex-row items-center">
-            <View
-              className="px-3 h-10 w-20 rounded-l-xl items-center justify-center"
-              style={styles.leftWrapper}
-            >
-              <Text className="text-white">{key}</Text>
-            </View>
-            <View
-              className="px-3 h-10 w-24 rounded-r-xl items-center justify-center"
-              style={styles.wrapper}
-            >
-              <View className="flex-row items-center">
+      {items.map((item) => (
+        <View className="pb-4">
+          <View
+            className="flex-row w-full items-center justify-between"
+            key={uuid.v4()}
+          >
+            <View className="flex-row items-center">
+              <View
+                className="px-3 h-10 w-20 rounded-l-xl items-center justify-center"
+                style={styles.leftWrapper}
+              >
+                <Text className="text-white">{item.size}</Text>
+              </View>
+              <View
+                className="px-3 h-10 w-24 rounded-r-xl items-center justify-center"
+                style={styles.wrapper}
+              >
+                <View className="flex-row items-center">
+                  <Text
+                    style={styles.textColor}
+                    className="font-bold text-lg pr-1"
+                  >
+                    $
+                  </Text>
+                  <Text className="font-bold text-lg text-white">
+                    {addCents(item.price)}
+                  </Text>
+                </View>
+              </View>
+              <View className="flex-row items-center pl-4">
                 <Text
                   style={styles.textColor}
-                  className="font-bold text-lg pr-1"
+                  className="font-semibold text-lg pr-2"
                 >
-                  $
+                  X
                 </Text>
                 <Text className="font-bold text-lg text-white">
-                  {addCents(size[0].price)}
+                  {item.quantity}
                 </Text>
               </View>
             </View>
-            <View className="flex-row items-center pl-4">
-              <Text
-                style={styles.textColor}
-                className="font-semibold text-lg pr-2"
-              >
-                X
-              </Text>
-              <Text className="font-bold text-lg text-white">
-                {size.length}
+            <View></View>
+            <View>
+              <Text style={styles.textColor} className="text-xl">
+                {addCents(item.price * item.quantity)}
               </Text>
             </View>
           </View>
-          <View></View>
-          <View>
-            <Text style={styles.textColor} className="text-xl">
-              {addCents(size[0].price * size.length)}
-            </Text>
-          </View>
+          {item.options?.length > 0 && (
+            <View className="w-full pt-2 items-center">
+              {item.options.map((item) => (
+                <View
+                  key={uuid.v4()}
+                  className="w-1/2 flex-row justify-center items-center pl-2 pr-3"
+                >
+                  <View className="w-full flex-row justify-between items-center">
+                    <Text className="text-white font-light">{item.name}</Text>
+                    <View className="flex-row items-center">
+                      <Text
+                        style={styles.textColor}
+                        className="font-light text-sm px-2"
+                      >
+                        X
+                      </Text>
+                      <Text className="text-white font-light">
+                        {item.quantity}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
       ))}
     </View>

@@ -45,8 +45,6 @@ const RegistrationScreen = ({ navigation }) => {
       quality: 1,
     });
 
-    // console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
       const blob = await getBlobFromUri(result.assets[0].uri);

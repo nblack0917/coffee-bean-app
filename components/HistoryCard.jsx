@@ -16,16 +16,13 @@ const HistoryCard = ({ order }) => {
       return results;
     }, {});
 
-    // console.log(grouped);
-
     setGroupedItems(grouped);
   }, [order]);
 
   const getTotalItemPrice = (items) => {
     let finalTotal = 0;
     items.forEach((item) => {
-      console.log(item.price);
-      finalTotal = finalTotal + item.price;
+      finalTotal = finalTotal + item.price * item.quantity;
     });
     return finalTotal;
   };

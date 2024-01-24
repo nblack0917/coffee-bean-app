@@ -1,7 +1,9 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
+import _ from "lodash";
 
 const initialState = {
   items: [],
+  cartItemNumber: 0,
   checkout: {
     id: null,
     items: [],
@@ -20,19 +22,37 @@ export const cartSlice = createSlice({
   initialState,
   reducers: {
     addToCart: (state, action) => {
-      state.items = [...state.items, action.payload];
+      const index = state.items.findIndex(
+        (item) =>
+          item.product._id === action.payload.product._id &&
+          item.size === action.payload.size &&
+          _.isEqual(item.options, action.payload.options)
+      );
+      let newCart = [...state.items];
+      if (index >= 0) {
+        newCart[index].quantity = newCart[index].quantity + 1;
+      } else {
+        newCart = [...newCart, action.payload];
+      }
+      state.items = newCart;
+      state.cartItemNumber++;
     },
     removeFromCart: (state, action) => {
       const index = state.items.findIndex(
         (item) =>
-          item.product._id === action.payload.id &&
-          item.size === action.payload.size
+          item.product._id === action.payload.product._id &&
+          item.size === action.payload.size &&
+          _.isEqual(item.options, action.payload.options)
       );
 
       let newCart = [...state.items];
 
       if (index >= 0) {
-        newCart.splice(index, 1);
+        if (newCart[index].quantity === 1) {
+          newCart.splice(index, 1);
+        } else {
+          newCart[index].quantity = newCart[index].quantity - 1;
+        }
       } else {
         console.warn(
           `Can't remove product (id: ${action.payload.id}) as it is not in cart!`
@@ -40,9 +60,11 @@ export const cartSlice = createSlice({
       }
 
       state.items = newCart;
+      state.cartItemNumber--;
     },
     clearCart: (state) => {
       state.items = [];
+      state.cartItemNumber = 0;
     },
     addToCheckout: (state, action) => {
       state.checkout = action.payload.checkout;
@@ -82,6 +104,8 @@ export const {
 } = cartSlice.actions;
 
 export const selectCartItems = (state) => state.cart.items;
+
+export const selectCartItemNumber = (state) => state.cart.cartItemNumber;
 
 export const selectCheckout = (state) => state.cart.checkout;
 
